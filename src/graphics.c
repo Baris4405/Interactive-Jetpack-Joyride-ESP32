@@ -1,0 +1,225 @@
+// ============================================
+// The Graphics class file
+//
+// Copyright 2026 Georgia Tech. All rights reserved.
+// The materials provided by the instructor in this course are for
+// the use of the students currently enrolled in the course.
+// Copyrighted course materials may not be further disseminated.
+// This file must NOT be made publicly available anywhere.
+//==================================================================
+
+
+#include "graphics.h"
+
+void draw_nothing(int u, int v)
+{
+    uLCD_filled_rectangle(&myLCD, u, v, u + 10, v + 10, BLACK);
+}
+
+void draw_img(int u, int v, const char* img)
+{
+    int colors[11 * 11];
+    for (int i = 0; i < 11 * 11; i++)
+    {
+        if (img[i] == 'R') colors[i] = RED;
+        else if (img[i] == 'Y') colors[i] = YELLOW;
+        else if (img[i] == 'G') colors[i] = GREEN;
+        else if (img[i] == 'D') colors[i] = 0xD2691E;   // "Dirt"
+        else if (img[i] == '5') colors[i] = LGREY;      // 50% grey
+        else if (img[i] == '3') colors[i] = DGREY;
+        else if (img[i] == 'W') colors[i] = WHITE;
+        else if (img[i] == 'Z') colors[i] = BLACK;
+        else if (img[i] == 'P') colors[i] = PURPLE;
+        else colors[i] = BLACK;
+    }
+    uLCD_BLIT(&myLCD, u, v, 11, 11, colors);
+    esp_rom_delay_us(250); // Recovery time!
+}
+// For each sprite, there is an array of 121 characters describing the color of each pixel of the tile where the sprite is drawn
+// Characters describe colors according to draw_img
+// Feel free to add more!
+void draw_wall(int u, int v)
+{
+    // Shape 1: Base colored filled rectangle for the wall background
+    uLCD_filled_rectangle(&myLCD, u, v, u + 10, v + 10, 0x0265A4); 
+
+    // Shape 2: A hollow rectangle to create a unified border around every single block
+    uLCD_rectangle(&myLCD, u, v, u + 10, v + 10, 0x014773);
+
+    // Shapes 3 & 4: Diagonal lines crossing the block to make it look like a reinforced crate
+    uLCD_line(&myLCD, u, v, u + 10, v + 10, 0x014773);
+    uLCD_line(&myLCD, u + 10, v, u, v + 10, 0x014773);
+    esp_rom_delay_us(50);
+}
+
+void draw_nectar(int u, int v)
+{
+    static int nectar[121] = { // Nectar sprite from Piskel
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xFF0100, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xFF0100, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xD0B0B0, 0xFF0100, 
+        0xFF0100, 0xFF0100, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xFF0100, 0xFF0100, 0xD0B0B0, 0xFF0100, 0xFF0100, 0xFF0100
+    };
+
+    uLCD_BLIT(&myLCD, u, v, 11, 11, nectar);
+    esp_rom_delay_us(50);
+}
+
+void draw_buzz(int u, int v)
+{
+    // TODO: Implement
+    // This is the only given sprite: it is intended to show how you can make one yourself
+    // Feel free to overwrite this one with your own buzz!
+    static int buzz_sprite[121] = {
+        0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9,
+        0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9,
+        0x0000F9, 0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x00F9F7, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x00F9F7, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x00F9F7, 0x00F9F7, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000,
+        0x00F9F7, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x00F9F7, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9,
+        0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9
+    };
+
+    uLCD_BLIT(&myLCD, u, v, 11, 11, buzz_sprite); // Draw the buzz sprite using the color values that I made custom 
+    esp_rom_delay_us(50); // Recovery time after drawing the sprite 
+}
+//advanced feature: directional sprites for the buzz, showing different motion lines based on the direction of movement (up, down, right)
+//Note: I tried to make is visible but since my buzz is colorful and the blast/arrow is small, it may be hard to see. Feel free to modify the blast/arrow design and colors to make it more visible!
+void draw_buzz_direction(int u, int v, int dir)
+{
+    static int buzz_sprite[121] = {
+        0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9,
+        0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9,
+        0x0000F9, 0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x00F9F7, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x00F9F7, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x00F9F7, 0x00F9F7, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000,
+        0x00F9F7, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x00F9F7, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x00F9F7, 0x000000, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9, 0xED00F9, 0xED00F9,
+        0x0000F9, 0x00F9F7, 0x00F9F7, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0000F9, 0xED00F9,
+        0x00F9F7, 0x00F9F7, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0BFDFB, 0x0BFD66, 0x0000F9
+    };
+
+    int rotated[121]; // Temporary array to hold the rotated sprite for up/down directions
+
+    if (dir == 1) { //Looking UP: rotate original right-facing sprite counterclockwise
+        for (int row = 0; row < 11; row++) { // Rotate the sprite 90 degrees counterclockwise by mapping pixels from the original sprite to the rotated position
+            for (int col = 0; col < 11; col++) { // The pixel at (col, 10 - row) in the original becomes (row, col) in the rotated version
+                rotated[row * 11 + col] = buzz_sprite[col * 11 + (10 - row)]; // This mapping effectively rotates the sprite so that the motion lines point upwards when the buzz is moving up
+            }
+        }
+        uLCD_BLIT(&myLCD, u, v, 11, 11, rotated); // Draw the rotated sprite for the up direction
+    } 
+    else if (dir == 2) { //Looking Down: rotate original right-facing sprite clockwise
+         for (int row = 0; row < 11; row++) { // Rotate the sprite 90 degrees clockwise by mapping pixels from the original sprite to the rotated position
+            for (int col = 0; col < 11; col++) { // The pixel at (10 - col, row) in the original becomes (row, col) in the rotated version
+                rotated[row * 11 + col] = buzz_sprite[(10 - col) * 11 + row]; // This mapping effectively rotates the sprite so that the motion lines point downwards when the buzz is moving down
+            }
+        }
+        uLCD_BLIT(&myLCD, u, v, 11, 11, rotated); // Draw the rotated sprite for the down direction
+    } 
+    else {
+        uLCD_BLIT(&myLCD, u, v, 11, 11, buzz_sprite); // For the right direction, we can just use the original sprite without rotation since it is already facing right
+    }
+
+    esp_rom_delay_us(50); // Recovery time after drawing the sprite
+}
+
+void draw_heal(int u, int v)
+{
+    static int heal[121] = { //Heal sprite from Piskel
+        0x0AC6CD, 0x0AC6CD, 0xAE0BAF, 0xAE0BAF, 0x00F270, 0x00F270, 0x00F270, 0xAE0BAF, 0xAE0BAF, 0x0AC6CD, 0x0AC6CD, 
+        0x0AC6CD, 0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 0x00F270, 0x7AAF0B, 0x00F270, 0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 0x0AC6CD, 
+        0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 0x00F270, 0x7AAF0B, 0xAE0BAF, 0x7AAF0B, 0x00F270, 0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 
+        0xAE0BAF, 0xAE0BAF, 0x00F270, 0x7AAF0B, 0x7AAF0B, 0x7AAF0B, 0x7AAF0B, 0x7AAF0B, 0x00F270, 0xAE0BAF, 0xAE0BAF, 
+        0x00F270, 0x00F270, 0x7AAF0B, 0x7AAF0B, 0x00F270, 0x00F270, 0x00F270, 0x7AAF0B, 0x7AAF0B, 0x00F270, 0x00F270, 
+        0x00F270, 0x7AAF0B, 0xAE0BAF, 0x7AAF0B, 0x00F270, 0x00F270, 0x00F270, 0x7AAF0B, 0xAE0BAF, 0x7AAF0B, 0x00F270, 
+        0x00F270, 0x00F270, 0x7AAF0B, 0x7AAF0B, 0x00F270, 0x00F270, 0x00F270, 0x7AAF0B, 0x7AAF0B, 0x00F270, 0x00F270, 
+        0xAE0BAF, 0xAE0BAF, 0x00F270, 0x7AAF0B, 0x7AAF0B, 0x7AAF0B, 0x7AAF0B, 0x7AAF0B, 0x00F270, 0xAE0BAF, 0xAE0BAF, 
+        0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 0x00F270, 0x7AAF0B, 0xAE0BAF, 0x7AAF0B, 0x00F270, 0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 
+        0x0AC6CD, 0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 0x00F270, 0x7AAF0B, 0x00F270, 0xAE0BAF, 0xAE0BAF, 0xAE0BAF, 0x0AC6CD, 
+        0x0AC6CD, 0x0AC6CD, 0xAE0BAF, 0xAE0BAF, 0x00F270, 0x00F270, 0x00F270, 0xAE0BAF, 0xAE0BAF, 0x0AC6CD, 0x0AC6CD
+    };
+
+    uLCD_BLIT(&myLCD, u, v, 11, 11, heal);
+    esp_rom_delay_us(50);
+}
+
+void draw_poison(int u, int v)
+{
+    static int posion[121] = {// Poison sprite from Piskel
+        0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x08C104, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x08C104, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x08C104, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 0x08C104, 0x08C104, 0x08C104, 0x3D037E, 0x3D037E, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x3D037E, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x3D037E, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x08C104, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x08C104, 0x08C104, 0x08C104, 0x000000, 0x08C104, 0x08C104, 0x08C104, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x3D037E, 0x08C104, 0x08C104, 0x000000, 0x000000, 0x000000, 0x08C104, 0x08C104, 0x3D037E, 0x3D037E, 
+        0x3D037E, 0x08C104, 0x08C104, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x08C104, 0x08C104, 0x3D037E, 
+        0x08C104, 0x08C104, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x08C104, 0x08C104
+    };
+
+    uLCD_BLIT(&myLCD, u, v, 11, 11, posion); 
+    esp_rom_delay_us(50);
+}
+
+void draw_stinger(int u, int v)
+{
+    static int stinger[121] = { // Stinger sprite from Piskel
+        0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 0x000000, 0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0, 
+        0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 0x000000, 0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 
+        0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 0x000000, 0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 
+        0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 0x000000, 0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 
+        0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0, 0x000000, 0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 
+        0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x0000D0, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 
+        0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0, 0x000000, 0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 
+        0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 0x000000, 0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 
+        0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 0x000000, 0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 
+        0xD4006F, 0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 0x000000, 0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0, 0xD4006F, 
+        0x0000D0, 0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 0x000000, 0xD4006F, 0xD4006F, 0xD4006F, 0xD4006F, 0x0000D0
+    };
+
+    uLCD_BLIT(&myLCD, u, v, 11, 11, stinger); // Draw the stinger sprite using the color values that I made custom
+    esp_rom_delay_us(50);
+}
+
+/**
+ * Draw the upper status bar.
+ */
+void draw_upper_status()
+{
+    uLCD_line(&myLCD, 0, 9, 127, 9, GREEN); // Draw a green line to separate the upper status bar from the game area
+}
+
+/**
+ * Draw the lower status bar.
+ */
+void draw_lower_status()
+{
+    uLCD_line(&myLCD, 0, 118, 127, 118, GREEN); // Draw a green line to separate the lower status bar from the game area
+}
+
+//Advanced feature: POllen
+void draw_pollen_tile(int u, int v)
+{   
+    uLCD_filled_rectangle(&myLCD, u, v, u + 10, v + 10, YELLOW); // Base filled rectangle for the pollen background
+    uLCD_line(&myLCD, u + 2, v + 2, u + 8, v + 8, WHITE); // Diagonal line from top-left to bottom-right to create a cross pattern on the pollen block
+    uLCD_line(&myLCD, u + 8, v + 2, u + 2, v + 8, WHITE); // Diagonal line from top-right to bottom-left to complete the cross pattern on the pollen block
+    uLCD_filled_circle(&myLCD, u + 5, v + 5, 1, WHITE); // Small filled circle in the center of the block to make it look more like a pollen block and add some visual interest
+
+    esp_rom_delay_us(50); // Recovery time after drawing the pollen sprite
+}
